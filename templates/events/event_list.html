@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Discover events | EventCreate{% endblock %}
+{% block content %}
+<section class="landing-hero">
+  <div class="landing-hero-content">
+    <div class="eyebrow">Make time for what matters</div>
+    <h1>Find your next good gathering.</h1>
+    <p>Explore thoughtful local events, meet people who share your interests, and save a seat for what comes next.</p>
+    <a class="btn btn-orange mt-3" href="#discover">Explore events</a>
+  </div>
+</section>
+
+<section id="discover" class="pb-4">
+  <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+    <div><p class="eyebrow">What's happening</p><h2 class="section-heading mt-1 mb-0">Events to look forward to</h2></div>
+    <p class="muted text-sm">{{ events|length }} event{{ events|length|pluralize }} found</p>
+  </div>
+  <form class="glass rounded-2xl p-4 sm:p-5 mb-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end" method="get" data-auto-submit>
+    <div class="lg:col-span-2"><label for="search">Search</label><input id="search" name="q" type="text" placeholder="Title or topic" value="{{ filters.q }}"></div>
+    <div><label for="category">Category</label><select id="category" name="category"><option value="">All categories</option>{% for item in categories %}<option value="{{ item.slug }}" {% if filters.category == item.slug %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></div>
+    <div><label for="location">Location</label><input id="location" name="location" type="text" placeholder="City or venue" value="{{ filters.location }}"></div>
+    <div><label for="from">From</label><input id="from" name="from" type="date" value="{{ filters.from }}"></div>
+    <div><label for="to">To</label><input id="to" name="to" type="date" value="{{ filters.to }}"></div>
+    <div class="sm:col-span-2 lg:col-span-6 flex gap-2"><button class="btn btn-orange btn-sm" type="submit">Apply filters</button><a class="btn btn-outline-light btn-sm" href="{% url 'event_list' %}">Clear</a></div>
+  </form>
+  {% if events %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for event in events %}
+        <article class="event-card glass rounded-2xl">
+          <a class="event-cover" href="{% url 'event_detail' event.pk %}" aria-label="View {{ event.title }}">
+            {% if event.image %}<img src="{{ event.image.url }}" alt="{{ event.title }} event artwork">{% else %}<span class="cover-label">{{ event.category.name }}</span>{% endif %}
+            {% if event.image %}<span class="cover-label">{{ event.category.name }}</span>{% endif %}
+          </a>
+          <div class="p-5">
+            <div class="flex justify-between items-center gap-2 mb-3"><span class="badge badge-outline border-white/20 text-slate-200">{{ event.category.name }}</span>
+              {% if event.is_cancelled %}<span class="text-xs text-red-200">Cancelled</span>{% elif event.registration_total >= event.capacity %}<span class="text-xs text-amber-200">Event full</span>{% else %}<span class="text-xs text-emerald-200">{{ event.remaining_seat_count }} seats remaining</span>{% endif %}
+            </div>
+            <h3 class="text-xl font-bold leading-snug"><a href="{% url 'event_detail' event.pk %}">{{ event.title }}</a></h3>
+            <p class="muted mt-2 text-sm">{{ event.starts_at|date:"D, M j · g:i A" }}</p>
+            <p class="muted mt-1 text-sm">{{ event.location }}</p>
+            <a class="btn btn-outline-light btn-sm mt-5" href="{% url 'event_detail' event.pk %}">View event</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="glass rounded-2xl p-10 text-center"><h3 class="text-xl font-bold">No events match those filters</h3><p class="muted mt-2">Try a different date or search term.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} | EventCreate{% endblock %}
+{% block content %}
+<a class="text-sm muted hover:text-white" href="{% url 'event_list' %}">Back to events</a>
+<article class="glass overflow-hidden rounded-3xl mt-4">
+  <div class="event-cover h-56 sm:h-80">
+    {% if event.image %}<img src="{{ event.image.url }}" alt="{{ event.title }} event artwork">{% else %}<span class="cover-label">{{ event.category.name }}</span>{% endif %}
+  </div>
+  <div class="grid lg:grid-cols-[1fr_300px] gap-8 p-5 sm:p-8 lg:p-10">
+    <section>
+      <span class="badge badge-outline border-white/20 text-slate-200">{{ event.category.name }}</span>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-4">{{ event.title }}</h1>
+      {% if event.is_cancelled %}<p class="mt-4 text-red-200 font-semibold">This event has been cancelled.</p>{% endif %}
+      <p class="prose-copy mt-6 whitespace-pre-line">{{ event.description }}</p>
+      <div class="grid sm:grid-cols-2 gap-4 mt-8">
+        <div class="glass rounded-xl p-4"><p class="eyebrow">Date and time</p><p class="mt-2 font-semibold">{{ event.starts_at|date:"l, F j, Y" }}</p><p class="muted">{{ event.starts_at|date:"g:i A T" }}</p></div>
+        <div class="glass rounded-xl p-4"><p class="eyebrow">Location</p><p class="mt-2 font-semibold">{{ event.location }}</p>{% if event.map_url %}<a class="text-amber-200 text-sm underline underline-offset-4" href="{{ event.map_url }}" target="_blank" rel="noopener noreferrer">Open map</a>{% endif %}</div>
+      </div>
+    </section>
+    <aside class="glass rounded-2xl p-5 h-fit">
+      <p class="eyebrow">Seats</p>
+      <p class="text-4xl font-extrabold mt-2">{{ event.registration_total }}<span class="muted text-xl font-normal"> / {{ event.capacity }}</span></p>
+      <p class="muted mt-1">{{ event.seats_remaining }} seats remaining</p>
+      <div class="divider my-3"></div>
+      {% if is_registered %}
+        <p class="text-emerald-200 font-semibold">You have a seat saved.</p>
+        <form method="post" action="{% url 'cancel_registration' event.pk %}" data-confirm="Cancel your event registration?">{% csrf_token %}<button class="btn btn-outline-light w-full mt-4" type="submit">Cancel registration</button></form>
+      {% elif event.is_cancelled or event.is_past %}
+        <button class="btn btn-disabled w-full mt-3" disabled>Registration closed</button>
+      {% elif event.is_full %}
+        <button class="btn btn-disabled w-full mt-3" disabled>Event full</button>
+      {% elif user.is_authenticated %}
+        <form method="post" action="{% url 'register_event' event.pk %}">{% csrf_token %}<button class="btn btn-orange w-full mt-3" type="submit">Register for this event</button></form>
+      {% else %}
+        <a class="btn btn-orange w-full mt-3" href="{% url 'login' %}?next={{ request.path }}">Sign in to register</a>
+      {% endif %}
+      {% if user.is_staff %}
+        <div class="divider">Organizer tools</div>
+        <a class="btn btn-outline-light btn-sm w-full" href="{% url 'event_edit' event.pk %}">Edit event</a>
+        <a class="btn btn-outline-light btn-sm w-full mt-2" href="{% url 'event_registrations_csv' event.pk %}">Export attendee list</a>
+        {% if not event.is_cancelled %}<form method="post" action="{% url 'event_cancel' event.pk %}" data-confirm="Cancel this event and notify all attendees?">{% csrf_token %}<button class="btn btn-error btn-outline btn-sm w-full mt-2" type="submit">Cancel event</button></form>{% endif %}
+        <form method="post" action="{% url 'event_delete' event.pk %}" data-confirm="Delete this event and its registrations?">{% csrf_token %}<button class="btn btn-error btn-outline btn-sm w-full mt-2" type="submit">Delete event</button></form>
+      {% endif %}
+    </aside>
+  </div>
+</article>
+{% endblock %}

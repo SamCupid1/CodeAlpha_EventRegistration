@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Create account | EventCreate{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto py-8">
+  <div class="glass rounded-3xl p-6 sm:p-9">
+    <p class="eyebrow">Join the community</p><h1 class="text-3xl font-extrabold mt-2">Create your account</h1><p class="muted mt-2 mb-6">One small step toward your next great event.</p>
+    <form method="post" class="space-y-4">{% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="muted text-xs mt-1">{{ field.help_text }}</div>{% endif %}{% if field.errors %}<div class="form-errors mt-1">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+      <button class="btn btn-orange w-full mt-2" type="submit">Create account</button>
+    </form>
+    <p class="muted text-sm mt-5 text-center">Already registered? <a class="text-amber-200 underline" href="{% url 'login' %}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}

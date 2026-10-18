@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Sign in | EventCreate{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto py-8">
+  <div class="glass rounded-3xl p-6 sm:p-9">
+    <p class="eyebrow">Welcome back</p>
+    <h1 class="text-3xl font-extrabold mt-2">Sign in</h1>
+    <p class="muted mt-2 mb-6">Pick up where your calendar left off.</p>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}{{ form.non_field_errors }}
+      {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <div class="form-errors mt-1">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <button class="btn btn-orange w-full mt-2" type="submit">
+        Sign in
+      </button>
+    </form>
+    <p class="muted text-sm mt-5 text-center">New here? <a class="text-amber-200 underline"
+        href="{% url 'signup' %}">Create an account</a></p>
+  </div>
+</div>
+{% endblock %}

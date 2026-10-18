@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} | EventCreate{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-5">
+  <a class="text-sm muted hover:text-white" href="{% url 'staff_dashboard' %}">Back to dashboard</a>
+  <div class="glass rounded-3xl p-5 sm:p-8 mt-4">
+    <p class="eyebrow">Organizer tools</p><h1 class="text-3xl font-extrabold mt-2 mb-6">{{ heading }}</h1>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">{% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+          {% if field.help_text %}<p class="muted text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+          {% if field.errors %}<div class="form-errors mt-1">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <div class="pt-2 flex gap-3"><button class="btn btn-orange" type="submit">Save event</button><a class="btn btn-outline-light" href="{% url 'staff_dashboard' %}">Discard</a></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

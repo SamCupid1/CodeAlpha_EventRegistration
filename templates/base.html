@@ -1,0 +1,50 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101726">
+  <title>{% block title %}EventCreate{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}?v=2">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="site-nav sticky top-0 z-30">
+    <nav class="navbar page-shell min-h-16 px-0" aria-label="Main navigation">
+      <div class="flex-1"><a class="brand-mark text-xl" href="{% url 'event_list' %}">EVENT<span>CREATE</span></a></div>
+      <div class="flex-none gap-1 sm:gap-2">
+        <a class="btn btn-ghost btn-sm text-slate-100" href="{% url 'event_list' %}">Explore</a>
+        {% if user.is_authenticated %}
+          <a class="btn btn-ghost btn-sm text-slate-100" href="{% url 'profile' %}">My events</a>
+          {% if user.is_staff %}<a class="btn btn-ghost btn-sm text-slate-100" href="{% url 'staff_dashboard' %}">Manage</a>{% endif %}
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-outline-light btn-sm" type="submit">Sign out</button></form>
+        {% else %}
+          <a class="btn btn-ghost btn-sm text-slate-100" href="{% url 'login' %}">Sign in</a>
+          <a class="btn btn-orange btn-sm" href="{% url 'signup' %}">Create account</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+  <main class="page-shell min-h-[70vh] py-5">
+    {% if messages %}
+      <div class="space-y-2 mb-5" aria-live="polite">
+        {% for message in messages %}
+          <div class="message {% if message.tags == 'success' %}message-success{% elif message.tags == 'error' %}message-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer mt-12 py-7">
+    <div class="page-shell flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <a class="brand-mark" href="{% url 'event_list' %}">EVENT<span>CREATE</span></a>
+      <p class="text-sm">Good gatherings start with a plan.</p>
+    </div>
+  </footer>
+  <script src="{% static 'js/site.js' %}?v=1" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

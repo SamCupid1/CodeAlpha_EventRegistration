@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My events | EventCreate{% endblock %}
+{% block content %}
+<div class="py-5"><p class="eyebrow">Your calendar</p><h1 class="text-4xl font-extrabold mt-2">My events</h1><p class="muted mt-2">Welcome back, {{ user.username }}.</p></div>
+<section class="mb-10">
+  <h2 class="section-heading">Coming up</h2>
+  {% if upcoming %}<div class="grid md:grid-cols-2 gap-4">{% for registration in upcoming %}
+    <article class="glass rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div><span class="badge badge-outline border-white/20 text-slate-200">{{ registration.event.category.name }}</span><h3 class="text-xl font-bold mt-2"><a href="{% url 'event_detail' registration.event.pk %}">{{ registration.event.title }}</a></h3><p class="muted mt-1">{{ registration.event.starts_at|date:"D, M j · g:i A" }} · {{ registration.event.location }}</p></div>
+      <form method="post" action="{% url 'cancel_registration' registration.event.pk %}" data-confirm="Cancel your event registration?">{% csrf_token %}<button class="btn btn-outline-light btn-sm" type="submit">Cancel seat</button></form>
+    </article>
+  {% endfor %}</div>{% else %}<div class="glass rounded-2xl p-6 muted">No upcoming registrations yet. <a class="text-amber-200 underline" href="{% url 'event_list' %}">Explore events</a></div>{% endif %}
+</section>
+<section><h2 class="section-heading">Past and cancelled</h2>
+  {% if past %}<div class="space-y-3">{% for registration in past %}<a class="glass rounded-xl p-4 flex flex-wrap justify-between gap-2 block hover:border-white/30" href="{% url 'event_detail' registration.event.pk %}"><span class="font-semibold">{{ registration.event.title }}</span><span class="muted text-sm">{% if registration.event.is_cancelled %}Cancelled{% else %}{{ registration.event.starts_at|date:"M j, Y" }}{% endif %}</span></a>{% endfor %}</div>{% else %}<p class="muted">Your past events will appear here.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Organizer dashboard | EventCreate{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 py-5">
+  <div><p class="eyebrow">Organizer workspace</p><h1 class="text-4xl font-extrabold mt-2">Event dashboard</h1></div>
+  <a class="btn btn-orange" href="{% url 'event_create' %}">Create event</a>
+</div>
+<section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+  <div class="glass rounded-2xl p-5"><p class="muted text-sm">Total events</p><p class="text-4xl font-extrabold mt-2">{{ total_events }}</p></div>
+  <div class="glass rounded-2xl p-5"><p class="muted text-sm">Total registrations</p><p class="text-4xl font-extrabold mt-2">{{ total_registrations }}</p></div>
+  <div class="glass rounded-2xl p-5"><p class="muted text-sm">Near capacity</p><p class="text-4xl font-extrabold mt-2">{{ near_capacity|length }}</p></div>
+</section>
+{% if near_capacity %}<section class="glass rounded-2xl p-5 mb-7"><h2 class="section-heading">Events near capacity</h2><div class="flex flex-wrap gap-2">{% for event in near_capacity %}<a class="badge badge-warning badge-outline py-3" href="{% url 'event_detail' event.pk %}">{{ event.title }} · {{ event.registration_total }}/{{ event.capacity }}</a>{% endfor %}</div></section>{% endif %}
+<section class="glass rounded-2xl p-5 sm:p-7">
+  <h2 class="section-heading">All events</h2>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Event</th><th>Date</th><th>Attendees</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    {% for event in events %}<tr>
+      <td><a class="font-semibold hover:text-amber-200" href="{% url 'event_detail' event.pk %}">{{ event.title }}</a><div class="muted text-xs">{{ event.category.name }}</div></td>
+      <td>{{ event.starts_at|date:"M j, Y" }}</td><td>{{ event.registration_total }} / {{ event.capacity }}</td>
+      <td>{% if event.is_cancelled %}<span class="text-red-200">Cancelled</span>{% elif event.registration_total >= event.capacity %}<span class="text-amber-200">Full</span>{% else %}<span class="text-emerald-200">Open</span>{% endif %}</td>
+      <td><a class="link link-warning" href="{% url 'event_registrations_csv' event.pk %}">CSV</a><span class="muted"> · </span><a class="link link-warning" href="{% url 'event_edit' event.pk %}">Edit</a></td>
+    </tr>{% empty %}<tr><td colspan="5" class="muted">No events created yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
